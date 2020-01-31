@@ -22,10 +22,12 @@ app.post('/basket-items', bodyParser.json(), (req, res) => {
   res.json(item);
 });
 
-app.use(express.static('api', {
+app.use('/phones', express.static('static/phones', {
   extensions: ['json'],
-  index: 'index.json',
+  index: ['index.json'],
 }));
+
+app.use(express.static('static'));
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}!`);
