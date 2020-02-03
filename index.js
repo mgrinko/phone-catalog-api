@@ -6,10 +6,11 @@ const port = process.env.PORT || 5000;
 app.use((req, res, next) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.set('Access-Control-Allow-Methods', 'DELETE');
   next();
 });
 
-const basketItems = [];
+let basketItems = [];
 
 app.get('/basket-items', (req, res) => {
   res.json(basketItems)
@@ -18,8 +19,16 @@ app.get('/basket-items', (req, res) => {
 app.post('/basket-items', bodyParser.json(), (req, res) => {
   const { item } = req.body;
 
-  basketItems.push(item);
+  basketItems = [...basketItems, item];
+
   res.json(item);
+});
+
+app.delete('/basket-items/:itemId', bodyParser.json(), (req, res) => {
+  const { itemId } = req.params;
+
+  basketItems = basketItems.filter(item => item !== itemId);
+  res.json(true);
 });
 
 app.use('/phones', express.static('static/phones', {
