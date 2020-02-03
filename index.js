@@ -6,29 +6,39 @@ const port = process.env.PORT || 5000;
 app.use((req, res, next) => {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
-  res.set('Access-Control-Allow-Methods', 'DELETE');
+  res.set('Access-Control-Allow-Methods', 'DELETE,PATCH');
   next();
 });
 
-let basketItems = [];
+const basketItems = {};
 
 app.get('/basket-items', (req, res) => {
-  res.json(basketItems)
+  res.json(Object.values(basketItems))
 });
 
 app.post('/basket-items', bodyParser.json(), (req, res) => {
-  const { item } = req.body;
+  const { itemId } = req.body;
 
-  basketItems = [...basketItems, item];
+  basketItems[itemId] = { id: itemId, count: 1 };
 
-  res.json(item);
+  res.json(basketItems[itemId]);
 });
 
-app.delete('/basket-items/:itemId', bodyParser.json(), (req, res) => {
+app.delete('/basket-items/:itemId', (req, res) => {
   const { itemId } = req.params;
 
-  basketItems = basketItems.filter(item => item !== itemId);
+  delete basketItems[itemId];
+
   res.json(true);
+});
+
+app.patch('/basket-items/:itemId', bodyParser.json(), (req, res) => {
+  const { count } = req.body;
+  const { itemId } = req.params;
+
+  basketItems[itemId].count = count;
+
+  res.json(basketItems[itemId]);
 });
 
 app.use('/phones', express.static('static/phones', {
